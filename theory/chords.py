@@ -1,4 +1,4 @@
-from theory.scales import NOTES_FLAT, NOTES_SHARP, choose_note_system
+from theory.scales import NOTES_FLAT, NOTES_SHARP, choose_note_system, get_note_index
 
 MAJOR_CHORDS = ["", "m", "m", "", "", "m", "°"]
 MINOR_CHORDS = ["m", "°", "", "m", "m", "", ""]
@@ -34,13 +34,12 @@ def get_secondary_dominants(scale, notes_system):
     return secondary_dominants
 
 
-def get_note_distance(root, note, notes_system):
-    return (notes_system.index(note) - notes_system.index(root)) % len(notes_system)
+def get_note_distance(root, note):
+    return (get_note_index(note) - get_note_index(root)) % 12
 
 
 def get_extended_chord_symbol(root, triad_quality, seventh_note, extension):
-    notes_system = choose_note_system(root)
-    seventh_distance = get_note_distance(root, seventh_note, notes_system)
+    seventh_distance = get_note_distance(root, seventh_note)
 
     if triad_quality == "":
         seventh_quality = "maj" if seventh_distance == 11 else ""

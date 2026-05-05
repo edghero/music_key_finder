@@ -1,5 +1,5 @@
 from theory.chords import build_chords
-from theory.scales import build_scale_with_notes, choose_modal_note_system
+from theory.scales import build_spelled_scale
 
 MODAL_INTERCHANGE_MODES = {
     "Aeolian": {
@@ -44,8 +44,7 @@ def build_modal_interchange_rows(root):
     rows = []
 
     for mode_name, mode_data in MODAL_INTERCHANGE_MODES.items():
-        notes = choose_modal_note_system(root, mode_name)
-        modal_scale = build_scale_with_notes(root, mode_data["pattern"], notes)
+        modal_scale = build_spelled_scale(root, mode_data["pattern"])
         modal_chords = build_chords(modal_scale, mode_data["chords"])
 
         rows.append(
@@ -65,8 +64,7 @@ def build_borrowed_chord_rows(root, home_chords):
     seen = set()
 
     for mode_name, mode_data in MODAL_INTERCHANGE_MODES.items():
-        notes = choose_modal_note_system(root, mode_name)
-        modal_scale = build_scale_with_notes(root, mode_data["pattern"], notes)
+        modal_scale = build_spelled_scale(root, mode_data["pattern"])
         modal_chords = build_chords(modal_scale, mode_data["chords"])
 
         for roman, scale_tone, chord in zip(mode_data["romans"], modal_scale, modal_chords):
