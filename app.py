@@ -1,5 +1,6 @@
 import streamlit as st
 
+from instruments.piano import render_keyboard_html
 from theory.borrowed_chords import build_borrowed_chord_rows, build_modal_interchange_rows
 from theory.chords import (
     MAJOR_CHORDS,
@@ -118,6 +119,7 @@ def main():
             width="stretch",
             hide_index=True,
         )
+        st.markdown(render_keyboard_html(scale), unsafe_allow_html=True)
 
     with progressions_tab:
         st.subheader("Common Progressions")
