@@ -13,41 +13,50 @@ WHITE_KEYS = [
 ]
 
 BLACK_KEYS = [
-    ("C#/Db", 1, 9),
-    ("D#/Eb", 3, 23),
-    ("F#/Gb", 6, 51),
-    ("G#/Ab", 8, 65),
-    ("A#/Bb", 10, 79),
+    ("C#/Db", 1, 0),
+    ("D#/Eb", 3, 1),
+    ("F#/Gb", 6, 3),
+    ("G#/Ab", 8, 4),
+    ("A#/Bb", 10, 5),
 ]
 
 
-def render_keyboard_html(highlight_notes, title="Keyboard"):
+def render_keyboard_html(highlight_notes, title="Keyboard", octaves=2):
     highlighted_indexes = {get_note_index(note) for note in highlight_notes}
+    total_white_keys = len(WHITE_KEYS) * octaves
+    white_key_width = 100 / total_white_keys
+    black_key_width = white_key_width * 0.62
 
     white_keys_html = []
-    for note_name, note_index in WHITE_KEYS:
-        is_highlighted = note_index in highlighted_indexes
-        classes = "piano-key white-key highlighted" if is_highlighted else "piano-key white-key"
-        label = note_name if is_highlighted else ""
-        white_keys_html.append(
-            f'<div class="{classes}"><span>{escape(label)}</span></div>'
-        )
+    for octave in range(octaves):
+        for note_name, note_index in WHITE_KEYS:
+            is_highlighted = note_index in highlighted_indexes
+            classes = "piano-key white-key highlighted" if is_highlighted else "piano-key white-key"
+            label = note_name if is_highlighted else ""
+            white_keys_html.append(
+                f'<div class="{classes}"><span>{escape(label)}</span></div>'
+            )
 
     black_keys_html = []
-    for note_name, note_index, left_percent in BLACK_KEYS:
-        is_highlighted = note_index in highlighted_indexes
-        classes = "piano-key black-key highlighted" if is_highlighted else "piano-key black-key"
-        label = note_name if is_highlighted else ""
-        black_keys_html.append(
-            f'<div class="{classes}" style="left: {left_percent}%"><span>{escape(label)}</span></div>'
-        )
+    for octave in range(octaves):
+        octave_offset = octave * len(WHITE_KEYS)
+
+        for note_name, note_index, white_key_position in BLACK_KEYS:
+            is_highlighted = note_index in highlighted_indexes
+            classes = "piano-key black-key highlighted" if is_highlighted else "piano-key black-key"
+            label = note_name if is_highlighted else ""
+            left_percent = (octave_offset + white_key_position + 1) * white_key_width
+            black_keys_html.append(
+                f'<div class="{classes}" style="left: {left_percent}%; width: {black_key_width}%">'
+                f"<span>{escape(label)}</span></div>"
+            )
 
     return f"""
     <style>
         .piano-wrapper {{
             margin-top: 1rem;
             width: 100%;
-            max-width: 760px;
+            max-width: 980px;
         }}
 
         .piano-title {{
@@ -94,7 +103,6 @@ def render_keyboard_html(highlight_notes, title="Keyboard"):
             position: absolute;
             top: 0;
             z-index: 2;
-            width: 9%;
             height: 62%;
             transform: translateX(-50%);
             padding-bottom: 0.55rem;
