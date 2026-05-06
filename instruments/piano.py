@@ -21,7 +21,7 @@ BLACK_KEYS = [
 ]
 
 
-def render_keyboard_html(highlight_notes):
+def render_keyboard_html(highlight_notes, title="Keyboard"):
     highlighted_indexes = {get_note_index(note) for note in highlight_notes}
 
     white_keys_html = []
@@ -68,6 +68,7 @@ def render_keyboard_html(highlight_notes):
         }}
 
         .piano-key {{
+            position: relative;
             box-sizing: border-box;
             display: flex;
             align-items: flex-end;
@@ -104,13 +105,16 @@ def render_keyboard_html(highlight_notes):
         }}
 
         .white-key.highlighted {{
-            background: #d9f99d;
-            color: #365314;
+            background: #ffffff;
+            color: #92400e;
+            box-shadow: inset 0 -5px 0 #f59e0b;
         }}
 
         .black-key.highlighted {{
-            background: #2563eb;
-            color: #eff6ff;
+            background: #111827;
+            color: #fde68a;
+            outline: 3px solid #f59e0b;
+            outline-offset: -3px;
         }}
 
         .piano-key span {{
@@ -119,7 +123,7 @@ def render_keyboard_html(highlight_notes):
         }}
     </style>
     <div class="piano-wrapper">
-        <p class="piano-title">Keyboard</p>
+        <p class="piano-title">{escape(title)}</p>
         <div class="piano">
             {''.join(white_keys_html)}
             {''.join(black_keys_html)}

@@ -10,6 +10,7 @@ from theory.chords import (
     build_altered_dominant_rows,
     build_chords,
     build_extended_chord_rows,
+    build_triad_tones,
     get_chord_root,
     get_dominant_for_target,
     get_secondary_dominants,
@@ -66,6 +67,18 @@ def build_secondary_dominant_rows(scale, root):
     return rows
 
 
+def get_selected_row_index(selection, default=0):
+    try:
+        selected_rows = selection.selection.rows
+    except AttributeError:
+        selected_rows = selection.get("selection", {}).get("rows", []) if isinstance(selection, dict) else []
+
+    if selected_rows:
+        return selected_rows[0]
+
+    return default
+
+
 def show_key_summary(root, mode, scale, chords, relative_key):
     st.subheader(f"{root} {mode}")
 
@@ -114,12 +127,33 @@ def main():
 
     with chords_tab:
         st.subheader("Scale & Chords")
-        st.dataframe(
-            build_diatonic_chord_rows(romans, scale, chords),
-            width="stretch",
-            hide_index=True,
+        chord_rows = build_diatonic_chord_rows(romans, scale, chords)
+
+        try:
+            chord_selection = st.dataframe(
+                chord_rows,
+                width="stretch",
+                hide_index=True,
+                key=f"scale_chords_{root}_{mode}",
+                on_select="rerun",
+                selection_mode="single-row",
+            )
+            selected_chord_index = get_selected_row_index(chord_selection)
+        except TypeError:
+            st.dataframe(
+                chord_rows,
+                width="stretch",
+                hide_index=True,
+            )
+            selected_chord = st.selectbox("Keyboard chord", chords)
+            selected_chord_index = chords.index(selected_chord)
+
+        selected_chord = chords[selected_chord_index]
+        chord_tones = build_triad_tones(scale, selected_chord_index)
+        st.markdown(
+            render_keyboard_html(chord_tones, title=f"Keyboard: {selected_chord}"),
+            unsafe_allow_html=True,
         )
-        st.markdown(render_keyboard_html(scale), unsafe_allow_html=True)
 
     with progressions_tab:
         st.subheader("Common Progressions")

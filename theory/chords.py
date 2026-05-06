@@ -11,6 +11,14 @@ def build_chords(scale, chord_pattern):
     return [note + quality for note, quality in zip(scale, chord_pattern)]
 
 
+def build_triad_tones(scale, chord_index):
+    return [
+        scale[chord_index % len(scale)],
+        scale[(chord_index + 2) % len(scale)],
+        scale[(chord_index + 4) % len(scale)],
+    ]
+
+
 def get_chord_root(chord):
     return chord.replace("m", "").replace("°", "").replace("7", "").replace("+", "")
 
