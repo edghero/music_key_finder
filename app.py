@@ -19,14 +19,32 @@ from theory.progressions import MAJOR_PROGRESSIONS, MINOR_PROGRESSIONS, build_pr
 from theory.scales import (
     MAJOR_PATTERN,
     MINOR_PATTERN,
-    NOTES_FLAT,
-    NOTES_SHARP,
     build_scale,
     choose_note_system,
     get_relative_key,
 )
 from theory.tritone_subs import get_tritone_substitution_for_target
 from theory.utils import format_sequence
+
+ROOT_OPTIONS = [
+    "C",
+    "C#",
+    "Db",
+    "D",
+    "D#",
+    "Eb",
+    "E",
+    "F",
+    "F#",
+    "Gb",
+    "G",
+    "G#",
+    "Ab",
+    "A",
+    "A#",
+    "Bb",
+    "B",
+]
 
 
 def get_mode_data(mode):
@@ -99,11 +117,9 @@ def main():
     st.title("Music Key Finder")
     st.caption("Explore scales, diatonic chords, progressions, and color chords by key.")
 
-    root_options = list(dict.fromkeys(NOTES_SHARP + NOTES_FLAT))
-
     input_col_1, input_col_2 = st.columns([1, 1])
     with input_col_1:
-        root = st.selectbox("Root note", root_options, index=root_options.index("C"))
+        root = st.selectbox("Root note", ROOT_OPTIONS, index=ROOT_OPTIONS.index("C"))
     with input_col_2:
         mode = st.selectbox("Mode", ["major", "minor"])
 

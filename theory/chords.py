@@ -1,4 +1,4 @@
-from theory.scales import NOTES_FLAT, NOTES_SHARP, choose_note_system, get_note_index
+from theory.scales import NOTES_FLAT, NOTES_SHARP, choose_note_system, get_note_index, spell_interval
 
 MAJOR_CHORDS = ["", "m", "m", "", "", "m", "°"]
 MINOR_CHORDS = ["m", "°", "", "m", "m", "", ""]
@@ -23,10 +23,8 @@ def get_chord_root(chord):
     return chord.replace("m", "").replace("°", "").replace("7", "").replace("+", "")
 
 
-def get_dominant_for_target(target_root, notes_system):
-    target_index = notes_system.index(target_root)
-    dominant_index = (target_index + 7) % len(notes_system)
-    return notes_system[dominant_index] + "7"
+def get_dominant_for_target(target_root, notes_system=None):
+    return spell_interval(target_root, semitones=7, letter_steps=4) + "7"
 
 
 def get_secondary_dominants(scale, notes_system):

@@ -1,7 +1,5 @@
-from theory.scales import NOTES_FLAT
+from theory.scales import spell_interval
 
 
-def get_tritone_substitution_for_target(target_root, notes_system):
-    target_index = notes_system.index(target_root)
-    tritone_sub_index = (target_index + 1) % len(notes_system)
-    return NOTES_FLAT[tritone_sub_index] + "7"
+def get_tritone_substitution_for_target(target_root, notes_system=None):
+    return spell_interval(target_root, semitones=1, letter_steps=1) + "7"

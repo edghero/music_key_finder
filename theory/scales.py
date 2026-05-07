@@ -29,8 +29,7 @@ def choose_modal_note_system(root, mode_name):
 
 
 def build_scale(root, pattern):
-    notes = choose_note_system(root)
-    return build_scale_with_notes(root, pattern, notes)
+    return build_spelled_scale(root, pattern)
 
 
 def build_scale_with_notes(root, pattern, notes):
@@ -87,6 +86,14 @@ def build_spelled_scale(root, pattern):
         scale.append(spell_note(letter, note_index))
 
     return scale
+
+
+def spell_interval(root, semitones, letter_steps):
+    root_letter = root[0].upper()
+    letter_index = NOTE_LETTERS.index(root_letter)
+    note_index = (get_note_index(root) + semitones) % 12
+    letter = NOTE_LETTERS[(letter_index + letter_steps) % len(NOTE_LETTERS)]
+    return spell_note(letter, note_index)
 
 
 def get_relative_key(scale, mode):
