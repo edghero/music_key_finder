@@ -1,5 +1,7 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
+from instruments.guitar import render_fretboard_html
 from instruments.piano import render_keyboard_html
 from theory.borrowed_chords import build_borrowed_chord_rows, build_modal_interchange_rows
 from theory.chords import (
@@ -8,9 +10,11 @@ from theory.chords import (
     MINOR_CHORDS,
     MINOR_ROMAN,
     build_altered_dominant_rows,
+    build_chord_finder_result,
     build_chords,
     build_extended_chord_rows,
-    build_triad_tones,
+    get_chord_extension_names,
+    get_chord_quality_names,
     get_chord_root,
     get_dominant_for_target,
     get_secondary_dominants,
@@ -85,18 +89,6 @@ def build_secondary_dominant_rows(scale, root):
     return rows
 
 
-def get_selected_row_index(selection, default=0):
-    try:
-        selected_rows = selection.selection.rows
-    except AttributeError:
-        selected_rows = selection.get("selection", {}).get("rows", []) if isinstance(selection, dict) else []
-
-    if selected_rows:
-        return selected_rows[0]
-
-    return default
-
-
 def show_key_summary(root, mode, scale, chords, relative_key):
     st.subheader(f"{root} {mode}")
 
@@ -130,9 +122,10 @@ def main():
 
     show_key_summary(root, mode, scale, chords, relative_key)
 
-    chords_tab, progressions_tab, extended_tab, tonicization_tab, modal_tab, borrowed_tab = st.tabs(
+    chords_tab, chord_finder_tab, progressions_tab, extended_tab, tonicization_tab, modal_tab, borrowed_tab = st.tabs(
         [
             "Scale & Chords",
+            "Chord Finder",
             "Progressions",
             "Extended / Altered Chords",
             "Tonicization",
@@ -144,31 +137,42 @@ def main():
     with chords_tab:
         st.subheader("Scale & Chords")
         chord_rows = build_diatonic_chord_rows(romans, scale, chords)
+        st.dataframe(
+            chord_rows,
+            width="stretch",
+            hide_index=True,
+        )
 
-        try:
-            chord_selection = st.dataframe(
-                chord_rows,
-                width="stretch",
-                hide_index=True,
-                key=f"scale_chords_{root}_{mode}",
-                on_select="rerun",
-                selection_mode="single-row",
-            )
-            selected_chord_index = get_selected_row_index(chord_selection)
-        except TypeError:
-            st.dataframe(
-                chord_rows,
-                width="stretch",
-                hide_index=True,
-            )
-            selected_chord = st.selectbox("Keyboard chord", chords)
-            selected_chord_index = chords.index(selected_chord)
+    with chord_finder_tab:
+        st.subheader("Chord Finder")
 
-        selected_chord = chords[selected_chord_index]
-        chord_tones = build_triad_tones(scale, selected_chord_index)
+        finder_col_1, finder_col_2, finder_col_3 = st.columns(3)
+        with finder_col_1:
+            chord_root = st.selectbox("Root", ROOT_OPTIONS, index=ROOT_OPTIONS.index(root))
+        with finder_col_2:
+            chord_quality = st.selectbox("Mode", get_chord_quality_names())
+        with finder_col_3:
+            chord_extension = st.selectbox("Extended / Altered", get_chord_extension_names())
+
+        chord_result = build_chord_finder_result(chord_root, chord_quality, chord_extension)
+        st.subheader(chord_result["symbol"])
+        st.dataframe(
+            chord_result["rows"],
+            width="stretch",
+            hide_index=True,
+        )
         st.markdown(
-            render_keyboard_html(chord_tones, title=f"Keyboard: {selected_chord}"),
+            render_keyboard_html(chord_result["tones"], title=f"Keyboard: {chord_result['symbol']}"),
             unsafe_allow_html=True,
+        )
+        components.html(
+            render_fretboard_html(
+                chord_result["tones"],
+                root_note=chord_root,
+                title=f"Guitar Fretboard: {chord_result['symbol']}",
+            ),
+            height=430,
+            scrolling=True,
         )
 
     with progressions_tab:

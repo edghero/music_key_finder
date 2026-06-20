@@ -6,9 +6,138 @@ MINOR_CHORDS = ["m", "°", "", "m", "m", "", ""]
 MAJOR_ROMAN = ["I", "ii", "iii", "IV", "V", "vi", "vii°"]
 MINOR_ROMAN = ["i", "ii°", "III", "iv", "v", "VI", "VII"]
 
+CHORD_QUALITIES = {
+    "Major": {
+        "symbol": "",
+        "intervals": [(0, 0, "Root"), (4, 2, "Major 3rd"), (7, 4, "Perfect 5th")],
+        "default_seventh": (11, 6, "Major 7th", "maj7"),
+    },
+    "Minor": {
+        "symbol": "m",
+        "intervals": [(0, 0, "Root"), (3, 2, "Minor 3rd"), (7, 4, "Perfect 5th")],
+        "default_seventh": (10, 6, "Minor 7th", "7"),
+    },
+    "Dominant": {
+        "symbol": "7",
+        "intervals": [(0, 0, "Root"), (4, 2, "Major 3rd"), (7, 4, "Perfect 5th")],
+        "default_seventh": (10, 6, "Minor 7th", "7"),
+    },
+    "Diminished": {
+        "symbol": "°",
+        "intervals": [(0, 0, "Root"), (3, 2, "Minor 3rd"), (6, 4, "Diminished 5th")],
+        "default_seventh": (9, 6, "Diminished 7th", "7"),
+    },
+    "Augmented": {
+        "symbol": "+",
+        "intervals": [(0, 0, "Root"), (4, 2, "Major 3rd"), (8, 4, "Augmented 5th")],
+        "default_seventh": (10, 6, "Minor 7th", "7"),
+    },
+    "Sus2": {
+        "symbol": "sus2",
+        "intervals": [(0, 0, "Root"), (2, 1, "Major 2nd"), (7, 4, "Perfect 5th")],
+        "default_seventh": (10, 6, "Minor 7th", "7"),
+    },
+    "Sus4": {
+        "symbol": "sus4",
+        "intervals": [(0, 0, "Root"), (5, 3, "Perfect 4th"), (7, 4, "Perfect 5th")],
+        "default_seventh": (10, 6, "Minor 7th", "7"),
+    },
+}
+
+CHORD_EXTENSIONS = {
+    "Triad": {"symbol": "", "intervals": []},
+    "6th": {"symbol": "6", "intervals": [(9, 5, "Major 6th")]},
+    "7th": {"symbol": None, "intervals": ["default_seventh"]},
+    "Major 7th": {"symbol": "maj7", "intervals": [(11, 6, "Major 7th")]},
+    "9th": {"symbol": "9", "intervals": ["default_seventh", (14, 1, "Major 9th")]},
+    "11th": {
+        "symbol": "11",
+        "intervals": ["default_seventh", (14, 1, "Major 9th"), (17, 3, "Perfect 11th")],
+    },
+    "13th": {
+        "symbol": "13",
+        "intervals": [
+            "default_seventh",
+            (14, 1, "Major 9th"),
+            (17, 3, "Perfect 11th"),
+            (21, 5, "Major 13th"),
+        ],
+    },
+    "b9": {"symbol": "7b9", "intervals": ["default_seventh", (13, 1, "Flat 9th")]},
+    "#9": {"symbol": "7#9", "intervals": ["default_seventh", (15, 1, "Sharp 9th")]},
+    "#11": {"symbol": "7#11", "intervals": ["default_seventh", (18, 3, "Sharp 11th")]},
+    "b13": {"symbol": "7b13", "intervals": ["default_seventh", (20, 5, "Flat 13th")]},
+}
+
 
 def build_chords(scale, chord_pattern):
     return [note + quality for note, quality in zip(scale, chord_pattern)]
+
+
+def get_chord_quality_names():
+    return list(CHORD_QUALITIES.keys())
+
+
+def get_chord_extension_names():
+    return list(CHORD_EXTENSIONS.keys())
+
+
+def build_chord_finder_result(root, quality_name, extension_name):
+    quality = CHORD_QUALITIES[quality_name]
+    extension = CHORD_EXTENSIONS[extension_name]
+    interval_specs = quality["intervals"].copy()
+
+    if quality_name == "Dominant" and extension_name == "Triad":
+        interval_specs.append(quality["default_seventh"])
+
+    for interval in extension["intervals"]:
+        if interval == "default_seventh":
+            default_seventh = quality["default_seventh"]
+            if default_seventh not in interval_specs:
+                interval_specs.append(default_seventh)
+        else:
+            interval_specs.append(interval)
+
+    tones = []
+    rows = []
+    seen_note_indexes = set()
+
+    for interval_spec in interval_specs:
+        semitones, letter_steps, interval_name = interval_spec[:3]
+        note = spell_interval(root, semitones, letter_steps)
+        note_index = get_note_index(note)
+
+        if note_index in seen_note_indexes:
+            continue
+
+        seen_note_indexes.add(note_index)
+        tones.append(note)
+        rows.append(
+            {
+                "Tone": note,
+                "Interval": interval_name,
+            }
+        )
+
+    if quality_name == "Dominant" and extension_name == "Triad":
+        extension_symbol = "7"
+    elif extension["symbol"] is None:
+        extension_symbol = quality["default_seventh"][3]
+    elif quality_name == "Major" and extension_name in ["9th", "11th", "13th"]:
+        extension_symbol = "maj" + extension["symbol"]
+    elif quality_name == "Major" and extension_name in ["b9", "#9", "#11", "b13"]:
+        extension_symbol = "maj" + extension["symbol"]
+    else:
+        extension_symbol = extension["symbol"]
+
+    quality_symbol = "" if quality_name == "Dominant" and extension_symbol else quality["symbol"]
+    symbol = f"{root}{quality_symbol}{extension_symbol}"
+
+    return {
+        "symbol": symbol,
+        "tones": tones,
+        "rows": rows,
+    }
 
 
 def build_triad_tones(scale, chord_index):
