@@ -23,9 +23,11 @@ from theory.progressions import MAJOR_PROGRESSIONS, MINOR_PROGRESSIONS, build_pr
 from theory.scales import (
     MAJOR_PATTERN,
     MINOR_PATTERN,
+    build_scale_finder_result,
     build_scale,
     choose_note_system,
     get_relative_key,
+    get_scale_mode_names,
 )
 from theory.tritone_subs import get_tritone_substitution_for_target
 from theory.utils import format_sequence
@@ -122,9 +124,10 @@ def main():
 
     show_key_summary(root, mode, scale, chords, relative_key)
 
-    chords_tab, chord_finder_tab, progressions_tab, extended_tab, tonicization_tab, modal_tab, borrowed_tab = st.tabs(
+    chords_tab, scales_tab, chord_finder_tab, progressions_tab, extended_tab, tonicization_tab, modal_tab, borrowed_tab = st.tabs(
         [
             "Scale & Chords",
+            "Scales",
             "Chord Finder",
             "Progressions",
             "Extended / Altered Chords",
@@ -141,6 +144,36 @@ def main():
             chord_rows,
             width="stretch",
             hide_index=True,
+        )
+
+    with scales_tab:
+        st.subheader("Scales")
+
+        scale_col_1, scale_col_2 = st.columns(2)
+        with scale_col_1:
+            scale_root = st.selectbox("Root", ROOT_OPTIONS, index=ROOT_OPTIONS.index(root), key="scale_root")
+        with scale_col_2:
+            scale_mode = st.selectbox("Mode", get_scale_mode_names(), key="scale_mode")
+
+        scale_result = build_scale_finder_result(scale_root, scale_mode)
+        st.subheader(scale_result["name"])
+        st.dataframe(
+            scale_result["rows"],
+            width="stretch",
+            hide_index=True,
+        )
+        st.markdown(
+            render_keyboard_html(scale_result["notes"], title=f"Keyboard: {scale_result['name']}"),
+            unsafe_allow_html=True,
+        )
+        components.html(
+            render_fretboard_html(
+                scale_result["notes"],
+                root_note=scale_root,
+                title=f"Guitar Fretboard: {scale_result['name']}",
+            ),
+            height=430,
+            scrolling=True,
         )
 
     with chord_finder_tab:

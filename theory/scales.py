@@ -6,6 +6,112 @@ NOTE_LETTERS = ["C", "D", "E", "F", "G", "A", "B"]
 MAJOR_PATTERN = [2, 2, 1, 2, 2, 2, 1]
 MINOR_PATTERN = [2, 1, 2, 2, 1, 2, 2]
 
+SCALE_MODES = {
+    "Major": [
+        (0, 0, "1"),
+        (2, 1, "2"),
+        (4, 2, "3"),
+        (5, 3, "4"),
+        (7, 4, "5"),
+        (9, 5, "6"),
+        (11, 6, "7"),
+    ],
+    "Natural Minor": [
+        (0, 0, "1"),
+        (2, 1, "2"),
+        (3, 2, "b3"),
+        (5, 3, "4"),
+        (7, 4, "5"),
+        (8, 5, "b6"),
+        (10, 6, "b7"),
+    ],
+    "Harmonic Minor": [
+        (0, 0, "1"),
+        (2, 1, "2"),
+        (3, 2, "b3"),
+        (5, 3, "4"),
+        (7, 4, "5"),
+        (8, 5, "b6"),
+        (11, 6, "7"),
+    ],
+    "Melodic Minor": [
+        (0, 0, "1"),
+        (2, 1, "2"),
+        (3, 2, "b3"),
+        (5, 3, "4"),
+        (7, 4, "5"),
+        (9, 5, "6"),
+        (11, 6, "7"),
+    ],
+    "Major Pentatonic": [
+        (0, 0, "1"),
+        (2, 1, "2"),
+        (4, 2, "3"),
+        (7, 4, "5"),
+        (9, 5, "6"),
+    ],
+    "Minor Pentatonic": [
+        (0, 0, "1"),
+        (3, 2, "b3"),
+        (5, 3, "4"),
+        (7, 4, "5"),
+        (10, 6, "b7"),
+    ],
+    "Blues": [
+        (0, 0, "1"),
+        (3, 2, "b3"),
+        (5, 3, "4"),
+        (6, 4, "b5"),
+        (7, 4, "5"),
+        (10, 6, "b7"),
+    ],
+    "Dorian": [
+        (0, 0, "1"),
+        (2, 1, "2"),
+        (3, 2, "b3"),
+        (5, 3, "4"),
+        (7, 4, "5"),
+        (9, 5, "6"),
+        (10, 6, "b7"),
+    ],
+    "Phrygian": [
+        (0, 0, "1"),
+        (1, 1, "b2"),
+        (3, 2, "b3"),
+        (5, 3, "4"),
+        (7, 4, "5"),
+        (8, 5, "b6"),
+        (10, 6, "b7"),
+    ],
+    "Lydian": [
+        (0, 0, "1"),
+        (2, 1, "2"),
+        (4, 2, "3"),
+        (6, 3, "#4"),
+        (7, 4, "5"),
+        (9, 5, "6"),
+        (11, 6, "7"),
+    ],
+    "Mixolydian": [
+        (0, 0, "1"),
+        (2, 1, "2"),
+        (4, 2, "3"),
+        (5, 3, "4"),
+        (7, 4, "5"),
+        (9, 5, "6"),
+        (10, 6, "b7"),
+    ],
+    "Locrian": [
+        (0, 0, "1"),
+        (1, 1, "b2"),
+        (3, 2, "b3"),
+        (5, 3, "4"),
+        (6, 4, "b5"),
+        (8, 5, "b6"),
+        (10, 6, "b7"),
+    ],
+}
+
 
 def choose_note_system(root):
     flat_keys = ["F", "Bb", "Eb", "Ab", "Db", "Gb", "Cb"]
@@ -30,6 +136,31 @@ def choose_modal_note_system(root, mode_name):
 
 def build_scale(root, pattern):
     return build_spelled_scale(root, pattern)
+
+
+def get_scale_mode_names():
+    return list(SCALE_MODES.keys())
+
+
+def build_scale_finder_result(root, mode_name):
+    rows = []
+    notes = []
+
+    for semitones, letter_steps, scale_degree in SCALE_MODES[mode_name]:
+        note = spell_interval(root, semitones, letter_steps)
+        notes.append(note)
+        rows.append(
+            {
+                "Degree": scale_degree,
+                "Note": note,
+            }
+        )
+
+    return {
+        "name": f"{root} {mode_name}",
+        "notes": notes,
+        "rows": rows,
+    }
 
 
 def build_scale_with_notes(root, pattern, notes):
