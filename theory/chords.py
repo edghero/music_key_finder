@@ -47,6 +47,9 @@ CHORD_QUALITIES = {
 CHORD_EXTENSIONS = {
     "Triad": {"symbol": "", "intervals": []},
     "6th": {"symbol": "6", "intervals": [(9, 5, "Major 6th")]},
+    "add9": {"symbol": "add9", "intervals": [(14, 1, "Major 9th")]},
+    "add11": {"symbol": "add11", "intervals": [(17, 3, "Perfect 11th")]},
+    "add13": {"symbol": "add13", "intervals": [(21, 5, "Major 13th")]},
     "7th": {"symbol": None, "intervals": ["default_seventh"]},
     "Major 7th": {"symbol": "maj7", "intervals": [(11, 6, "Major 7th")]},
     "9th": {"symbol": "9", "intervals": ["default_seventh", (14, 1, "Major 9th")]},
