@@ -166,11 +166,13 @@ def main():
             render_keyboard_html(scale_result["notes"], title=f"Keyboard: {scale_result['name']}"),
             unsafe_allow_html=True,
         )
+        scale_fretboard_labels = st.toggle("Show scale degrees on fretboard", key="scale_fretboard_degrees")
         components.html(
             render_fretboard_html(
                 scale_result["notes"],
                 root_note=scale_root,
                 title=f"Guitar Fretboard: {scale_result['name']}",
+                note_labels=scale_result["degrees"] if scale_fretboard_labels else scale_result["notes"],
             ),
             height=430,
             scrolling=True,
@@ -198,11 +200,13 @@ def main():
             render_keyboard_html(chord_result["tones"], title=f"Keyboard: {chord_result['symbol']}"),
             unsafe_allow_html=True,
         )
+        chord_fretboard_labels = st.toggle("Show chord degrees on fretboard", key="chord_fretboard_degrees")
         components.html(
             render_fretboard_html(
                 chord_result["tones"],
                 root_note=chord_root,
                 title=f"Guitar Fretboard: {chord_result['symbol']}",
+                note_labels=chord_result["degrees"] if chord_fretboard_labels else chord_result["tones"],
             ),
             height=430,
             scrolling=True,

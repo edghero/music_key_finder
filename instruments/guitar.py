@@ -17,8 +17,12 @@ def get_fret_note(open_note, fret):
     return NOTES_SHARP[note_index]
 
 
-def render_fretboard_html(highlight_notes, root_note=None, title="Guitar Fretboard", frets=12):
-    highlighted_notes = {get_note_index(note): note for note in highlight_notes}
+def render_fretboard_html(highlight_notes, root_note=None, title="Guitar Fretboard", frets=12, note_labels=None):
+    labels = note_labels or highlight_notes
+    highlighted_notes = {
+        get_note_index(note): label
+        for note, label in zip(highlight_notes, labels)
+    }
     root_index = get_note_index(root_note) if root_note else None
     fret_numbers = "".join(
         f'<div class="fret-number">{fret}</div>'

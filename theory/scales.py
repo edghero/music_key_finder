@@ -145,13 +145,16 @@ def get_scale_mode_names():
 def build_scale_finder_result(root, mode_name):
     rows = []
     notes = []
+    degrees = []
 
     for semitones, letter_steps, scale_degree in SCALE_MODES[mode_name]:
         note = spell_interval(root, semitones, letter_steps)
+        degree_label = "R" if scale_degree == "1" else scale_degree
         notes.append(note)
+        degrees.append(degree_label)
         rows.append(
             {
-                "Degree": scale_degree,
+                "Degree": degree_label,
                 "Note": note,
             }
         )
@@ -159,6 +162,7 @@ def build_scale_finder_result(root, mode_name):
     return {
         "name": f"{root} {mode_name}",
         "notes": notes,
+        "degrees": degrees,
         "rows": rows,
     }
 

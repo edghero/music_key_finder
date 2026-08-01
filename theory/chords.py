@@ -44,6 +44,29 @@ CHORD_QUALITIES = {
     },
 }
 
+
+CHORD_DEGREE_LABELS = {
+    "Root": "R",
+    "Major 2nd": "2",
+    "Minor 3rd": "b3",
+    "Major 3rd": "3",
+    "Perfect 4th": "4",
+    "Diminished 5th": "b5",
+    "Perfect 5th": "5",
+    "Augmented 5th": "#5",
+    "Major 6th": "6",
+    "Diminished 7th": "bb7",
+    "Minor 7th": "b7",
+    "Major 7th": "7",
+    "Flat 9th": "b9",
+    "Major 9th": "9",
+    "Sharp 9th": "#9",
+    "Perfect 11th": "11",
+    "Sharp 11th": "#11",
+    "Major 13th": "13",
+    "Flat 13th": "b13",
+}
+
 CHORD_EXTENSIONS = {
     "Triad": {"symbol": "", "intervals": []},
     "6th": {"symbol": "6", "intervals": [(9, 5, "Major 6th")]},
@@ -102,6 +125,7 @@ def build_chord_finder_result(root, quality_name, extension_name):
             interval_specs.append(interval)
 
     tones = []
+    degrees = []
     rows = []
     seen_note_indexes = set()
 
@@ -115,6 +139,7 @@ def build_chord_finder_result(root, quality_name, extension_name):
 
         seen_note_indexes.add(note_index)
         tones.append(note)
+        degrees.append(CHORD_DEGREE_LABELS.get(interval_name, interval_name))
         rows.append(
             {
                 "Tone": note,
@@ -139,6 +164,7 @@ def build_chord_finder_result(root, quality_name, extension_name):
     return {
         "symbol": symbol,
         "tones": tones,
+        "degrees": degrees,
         "rows": rows,
     }
 
